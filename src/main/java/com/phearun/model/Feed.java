@@ -1,10 +1,10 @@
-/*
+
 package com.phearun.model;
 
-*/
+
 /**
  * Created by PHEARUN on 12/9/2016.
- *//*
+ */
 
 public class Feed {
     private int id;
@@ -38,4 +38,4 @@ public class Feed {
         return "Feed{" + "id=" + id + ", text='" + text + '\'' + '}';
     }
 }
-*/
+
