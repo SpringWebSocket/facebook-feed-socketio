@@ -10,6 +10,9 @@
 		<button id="join">Join room</button>
 		<button id="leave">Leave room</button>
 		<button id="send">Send message to room</button>
+		
+		 <input type="file" name="file" id="file" />
+		 
 	</div>
 	
 	<script src="/static/js/socket.io/socket.io.js"></script>
@@ -60,6 +63,45 @@
     		console.log('message:', data);
     	});
     	
+    	
+    	$(document).ready(function() {
+
+            var fileInput = $('#file');
+            
+            fileInput.bind({
+              change: function() {
+                displayFiles1(this.files);
+              }
+            });
+
+            function displayFiles(files) {
+            	console.log(files);
+                $.each(files, function(i, file) {      
+                   //if (!file.type.match(/image.*/)) { return true;}           
+                   var reader = new FileReader();
+                   reader.onload = function(e) {
+                      socket.emit('binary', e.target.result);
+                   };
+                   reader.readAsArrayBuffer(file);
+                });
+            }
+            
+            function displayFiles1(files) {
+            	 console.log(files);
+            	 $.each(files, function(i, file) {      
+	            	 console.log(file.type);
+	            	 var reader = new FileReader();
+	                 reader.onload = function(e) {
+	                	  console.log(e);
+	                      /* socket.emit('object', {
+	                    	  file: e.target.result,
+	                    	  type: 'png'
+	                      }); */
+	                 };
+	                 reader.readAsArrayBuffer(file);
+            	 });
+            }
+        });		
     </script>
 </body>
 </html>

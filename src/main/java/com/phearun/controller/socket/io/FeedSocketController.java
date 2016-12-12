@@ -1,5 +1,9 @@
 package com.phearun.controller.socket.io;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -11,6 +15,7 @@ import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.listener.DataListener;
 import com.corundumstudio.socketio.listener.DisconnectListener;
 import com.phearun.model.Feed;
+import com.phearun.model.UploadFile;
 
 @Component
 public class FeedSocketController {
@@ -39,6 +44,12 @@ public class FeedSocketController {
 
 		//TODO: client message to room
 		this.nspFeed.addEventListener("toroom", String.class, onSendMessageToRoom);
+	
+		//TODO: handle binary data from client
+		this.nspFeed.addEventListener("binary", byte[].class, onBinaryHandler);
+		
+		//TODO: handle binary data from client
+		this.nspFeed.addEventListener("object", UploadFile.class, onBinaryObjectHandler);
 		
 	}
 	
@@ -93,5 +104,29 @@ public class FeedSocketController {
 			client.getNamespace().getRoomOperations(room).sendEvent("left", "somebody left room!");
 			ackSender.sendAckData("Left!");
 		}
+	};
+	
+	private DataListener<byte[]> onBinaryHandler = new DataListener<byte[]>() {
+		@Override
+		public void onData(SocketIOClient client, byte[] data, AckRequest ackSender) throws Exception {
+			System.out.println("binary data: " + data);
+			
+			/*FileOutputStream fos = new FileOutputStream("test.html");
+			fos.write(data);
+			fos.close();*/
+			
+			BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(new File("test.png")));
+			bos.write(data);
+			bos.close();
+		}
+			
+	};
+	
+	private DataListener<UploadFile> onBinaryObjectHandler = new DataListener<UploadFile>() {
+		@Override
+		public void onData(SocketIOClient client, UploadFile uploadFile, AckRequest ackSender) throws Exception {
+			System.out.println("binary data: " + uploadFile);
+		}
+			
 	};
 }
