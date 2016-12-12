@@ -24,7 +24,7 @@ public class FeedSocketController {
 	
 	@Autowired
 	public FeedSocketController(SocketIOServer server) {
-		
+		//TODO: create feed name space
 		this.nspFeed = server.addNamespace("/feed");
 		
 		//TODO: onConnect event listener
@@ -36,10 +36,10 @@ public class FeedSocketController {
 		//TODO: onCustom event listener
 		this.nspFeed.addEventListener("message", Feed.class, onFeed);
 		
-		//TODO: client join room
+		//TODO: handle client join room
 		this.nspFeed.addEventListener("join", String.class, onJoinRoom);
 		
-		//TODO: client join room
+		//TODO: handle client leave room
 		this.nspFeed.addEventListener("leave", String.class, onLeaveRoom);
 
 		//TODO: client message to room

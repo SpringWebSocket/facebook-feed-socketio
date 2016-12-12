@@ -16,6 +16,9 @@ public class SocketIOConfiguration {
 		com.corundumstudio.socketio.Configuration socketConfig = new com.corundumstudio.socketio.Configuration();
 	    socketConfig.setHostname("localhost");
 	    socketConfig.setPort(3000);
+	    
+	    socketConfig.setMaxFramePayloadLength(1*1024*1024); // megabytes * kilobytes * bytes
+	    
 	    return socketConfig;
 	}
 	

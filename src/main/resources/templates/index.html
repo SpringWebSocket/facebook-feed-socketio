@@ -93,10 +93,11 @@
 	            	 var reader = new FileReader();
 	                 reader.onload = function(e) {
 	                	  console.log(e);
-	                      /* socket.emit('object', {
+	                      socket.emit('object', {
+	                    	  name: file.name,
 	                    	  file: e.target.result,
-	                    	  type: 'png'
-	                      }); */
+	                    	  type: file.type
+	                      }); 
 	                 };
 	                 reader.readAsArrayBuffer(file);
             	 });
