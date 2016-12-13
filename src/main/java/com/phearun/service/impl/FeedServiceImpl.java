@@ -30,7 +30,7 @@ public class FeedServiceImpl implements FeedService {
 	}
 
 	@Override
-	public boolean remove(int id) {
+	public boolean remove(String id) {
 		return feedRepository.remove(id);
 	}
 
@@ -40,7 +40,7 @@ public class FeedServiceImpl implements FeedService {
 	}
 
 	@Override
-	public Feed findOne(int id) {
+	public Feed findOne(String id) {
 		return feedRepository.findOne(id);
 	}
 }

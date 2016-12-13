@@ -1,4 +1,4 @@
-package com.phearun.controller.socket.io;
+/*package com.phearun.controller.socket.io;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -111,9 +111,9 @@ public class FeedSocketController {
 		public void onData(SocketIOClient client, byte[] data, AckRequest ackSender) throws Exception {
 			System.out.println("binary data: " + data);
 			
-			/*FileOutputStream fos = new FileOutputStream("test.html");
+			FileOutputStream fos = new FileOutputStream("test.html");
 			fos.write(data);
-			fos.close();*/
+			fos.close();
 			
 			BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(new File("test.png")));
 			bos.write(data);
@@ -130,3 +130,4 @@ public class FeedSocketController {
 			
 	};
 }
+*/

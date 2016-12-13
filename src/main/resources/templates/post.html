@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<title>Admin Page | Spring</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<style>
+		*{
+			padding:0px;
+			margin: 0 auto;
+			box-sizing: border-box;
+		}
+		.container{
+			width: 500px;
+		}
+		div.post{
+			background-color:#dadada;
+			width:100%;
+		}
+		div#status{
+			margin-bottom:40px;
+		}
+		#status textarea{
+			margin-top:5px;
+			width:100%;
+		}
+		#btnPost{
+		}
+		.header{
+			background-color: #3e62a0;
+			min-height: 50px;
+			color:#fff;
+		}
+	</style>
+</head>
+<body>
+	<div class="header">Facebook</div>
+	<div class="container">
+		
+		<div id="status">
+			<textarea id="statusText" placeholder="What's your mind?"></textarea>
+			<button id="btnPost" class="pull-right btn btn-primary">Post</button>
+		</div>
+		<div id="posts">
+			
+		</div>
+	</div>
+	
+	<script src="/static/js/socket.io/socket.io.js"></script>
+    <script src="/static/js/jquery-1.7.2.min.js"></script>
+    <script>
+    
+   		var server = "http://localhost:3000/post";
+		var socket =  io.connect(server);
+
+    	socket.on('connect', function(){
+			console.log('connected to server', socket.id);
+			
+			$('button#btnPost').on('click', function(){
+				socket.emit('new post', {username: 'Phearun', text: $('#statusText').val()});
+			});
+			
+		});   
+    	
+    	socket.on('new post', function(data){
+    		
+    		console.log(data);
+    		var post = `<div class="post">
+    						<h1>${data.username} : ${data.text}</h1>
+    						<button id="${data.id}" class="btn btn-danger">Remove</button>
+    					</div>`;
+    		
+    		$('div#posts').prepend(post);
+    		
+    		$(`button#${data.id}`).on('click', function(){
+    			alert(data.id);
+    			socket.emit('remove post', data.id);
+    		});
+    	});
+    </script>
+</body>
+</html>

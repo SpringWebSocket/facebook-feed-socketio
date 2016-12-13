@@ -42,13 +42,13 @@ public class FeedController {
 	}
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
-	public ResponseEntity<Feed> findOne(@PathVariable("id") int id) {
+	public ResponseEntity<Feed> findOne(@PathVariable("id") String id) {
 		Feed feed = feedService.findOne(id);
 		return new ResponseEntity<Feed>(feed, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-	public ResponseEntity<String> remove(@PathVariable("id") int id) {
+	public ResponseEntity<String> remove(@PathVariable("id") String id) {
 		String message = "Feed remove failed!";
 		if (feedService.remove(id)) {
 			message = "Feed remove successfully!";

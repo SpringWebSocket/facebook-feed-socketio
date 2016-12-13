@@ -15,9 +15,9 @@ public interface FeedRepository {
 
 	boolean update(Feed feed);
 
-	boolean remove(int id);
+	boolean remove(String id);
 
 	List<Feed> findAll();
 
-	Feed findOne(int id);
+	Feed findOne(String id);
 }

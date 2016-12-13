@@ -25,7 +25,7 @@ public class FeedRepositoryImpl implements FeedRepository {
 	@Override
 	public boolean update(Feed feed) {
 		for (Feed f : feeds) {
-			if (f.getId() == feed.getId()) {
+			if (f.getId().equals(feed.getId())) {
 				f.setText(feed.getText());
 				return true;
 			}
@@ -34,9 +34,9 @@ public class FeedRepositoryImpl implements FeedRepository {
 	}
 
 	@Override
-	public boolean remove(int id) {
+	public boolean remove(String id) {
 		for (Feed f : feeds) {
-			if (f.getId() == id) {
+			if (f.getId().equals(id)) {
 				return feeds.remove(f);
 			}
 		}
@@ -49,9 +49,9 @@ public class FeedRepositoryImpl implements FeedRepository {
 	}
 
 	@Override
-	public Feed findOne(int id) {
+	public Feed findOne(String id) {
 		for (Feed feed : feeds) {
-			if (feed.getId() == id) {
+			if (feed.getId().equals(id)) {
 				return feed;
 			}
 		}
