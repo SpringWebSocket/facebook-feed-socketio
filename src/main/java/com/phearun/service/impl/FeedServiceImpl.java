@@ -43,4 +43,9 @@ public class FeedServiceImpl implements FeedService {
 	public Feed findOne(String id) {
 		return feedRepository.findOne(id);
 	}
+
+	@Override
+	public int updateLike(String id) {
+		return feedRepository.updateLike(id);
+	}
 }

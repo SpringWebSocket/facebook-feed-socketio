@@ -57,4 +57,16 @@ public class FeedRepositoryImpl implements FeedRepository {
 		}
 		return null;
 	}
+
+	@Override
+	public int updateLike(String id) {
+		for (Feed feed : feeds) {
+			if (feed.getId().equals(id)) {
+				feed.setLike(feed.getLike() + 1);
+				return feed.getLike();
+			}
+		}
+		return 0;
+	}
+	
 }

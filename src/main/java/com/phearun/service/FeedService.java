@@ -20,5 +20,7 @@ public interface FeedService {
 	List<Feed> findAll();
 
 	Feed findOne(String id);
+	
+	int updateLike(String id);
 
 }

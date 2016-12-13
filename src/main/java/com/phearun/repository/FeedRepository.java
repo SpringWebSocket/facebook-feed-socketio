@@ -20,4 +20,6 @@ public interface FeedRepository {
 	List<Feed> findAll();
 
 	Feed findOne(String id);
+	
+	int updateLike(String id);
 }

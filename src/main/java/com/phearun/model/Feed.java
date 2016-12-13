@@ -11,7 +11,7 @@ public class Feed {
     private String id;
     private String text;
     private String username;
-    
+    private int like;
     public Feed() {
     	id = UUID.randomUUID().toString();
     }
@@ -45,10 +45,17 @@ public class Feed {
 		this.username = username;
 	}
 
+	public int getLike() {
+		return like;
+	}
+
+	public void setLike(int like) {
+		this.like = like;
+	}
+
 	@Override
 	public String toString() {
-		return "Feed [id=" + id + ", text=" + text + ", username=" + username + "]";
+		return "Feed [id=" + id + ", text=" + text + ", username=" + username + ", like=" + like + "]";
 	}
-	
 }
 
