@@ -48,9 +48,12 @@
     <script src="/static/js/jquery-1.7.2.min.js"></script>
     <script>
     	var username = "user00-" + Math.floor(Math.random()*100);
-    	var Post = {};	
-   		var server = "http://localhost:3000/post";
-		var socket =  io.connect(server);
+    	var Post = {};
+    	
+    	var socketServerUrl = `${location.protocol}//${location.hostname}:3000`;
+   		var nspPost = `${socketServerUrl}/post`;
+   		
+		var socket =  io.connect(nspPost);
 		
     	socket.on('connect', function(){
 			console.log('connected to server', socket.id);

@@ -2,6 +2,7 @@ package com.phearun.configuration;
 
 import javax.annotation.PreDestroy;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -11,11 +12,17 @@ import com.corundumstudio.socketio.annotation.SpringAnnotationScanner;
 @Configuration
 public class SocketIOConfiguration {
 	
+	@Value("${socket.io.host}")
+	public String SOCKET_IO_HOST;
+	
+	@Value("${socket.io.port}")
+	public Integer SOCKET_IO_PORT;
+	
 	@Bean
 	public com.corundumstudio.socketio.Configuration socketConfig(){
 		com.corundumstudio.socketio.Configuration socketConfig = new com.corundumstudio.socketio.Configuration();
-	    socketConfig.setHostname("localhost");
-	    socketConfig.setPort(3000);
+	    socketConfig.setHostname(SOCKET_IO_HOST);
+	    socketConfig.setPort(SOCKET_IO_PORT);
 	    
 	    socketConfig.setMaxFramePayloadLength(1*1024*1024); // megabytes * kilobytes * bytes
 	    

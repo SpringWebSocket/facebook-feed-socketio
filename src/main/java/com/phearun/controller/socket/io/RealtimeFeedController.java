@@ -19,7 +19,7 @@ import com.phearun.service.FeedService;
 public class RealtimeFeedController {
 
 	private SocketIONamespace nspPost;
-
+	
 	@Autowired
 	private FeedService feedService;
 
