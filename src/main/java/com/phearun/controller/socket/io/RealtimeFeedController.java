@@ -23,6 +23,13 @@ public class RealtimeFeedController {
 	@Autowired
 	private FeedService feedService;
 
+	private DataListener<String> onStopTypingEvent = new DataListener<String>() {
+		@Override
+		public void onData(SocketIOClient client, String username, AckRequest ackSender) throws Exception {
+			nspPost.getBroadcastOperations().sendEvent("stop typing", username);
+		}
+	};
+
 	@Autowired
 	public RealtimeFeedController(SocketIOServer server) {
 		
@@ -39,6 +46,14 @@ public class RealtimeFeedController {
 		
 		//TODO: listening on "like post" event
 		this.nspPost.addEventListener("like post", String.class, onLikePostEvent);
+		
+		//TODO: listening on "typing " event 
+		this.nspPost.addEventListener("typing", String.class, onTypingEvent);
+		
+		//TODO: listening on "typing " event 
+		this.nspPost.addEventListener("stop typing", String.class, onStopTypingEvent );
+
+		
 	}
 	
 	private ConnectListener onConnect = new ConnectListener() {
@@ -92,6 +107,13 @@ public class RealtimeFeedController {
 		@Override
 		public void onDisconnect(SocketIOClient client) {
 			System.out.println("Client Disconnected! " + client.getSessionId());
+		}
+	};
+	
+	private DataListener<String> onTypingEvent = new DataListener<String>() {
+		@Override
+		public void onData(SocketIOClient client, String username, AckRequest ackSender) throws Exception {
+			nspPost.getBroadcastOperations().sendEvent("typing", username);
 		}
 	};
 }
