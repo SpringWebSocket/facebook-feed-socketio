@@ -115,9 +115,9 @@ public class FeedSocketController {
 			fos.write(data);
 			fos.close();
 			
-			BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(new File("test.png")));
+			/*BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(new File("test.png")));
 			bos.write(data);
-			bos.close();
+			bos.close();*/
 		}
 			
 	};

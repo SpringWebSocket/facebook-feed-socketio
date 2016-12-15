@@ -23,13 +23,6 @@ public class RealtimeFeedController {
 	@Autowired
 	private FeedService feedService;
 
-	private DataListener<String> onStopTypingEvent = new DataListener<String>() {
-		@Override
-		public void onData(SocketIOClient client, String username, AckRequest ackSender) throws Exception {
-			nspPost.getBroadcastOperations().sendEvent("stop typing", username);
-		}
-	};
-
 	@Autowired
 	public RealtimeFeedController(SocketIOServer server) {
 		
@@ -52,30 +45,31 @@ public class RealtimeFeedController {
 		
 		//TODO: listening on "typing " event 
 		this.nspPost.addEventListener("stop typing", String.class, onStopTypingEvent );
-
-		
 	}
 	
+	//TODO: connect handler
 	private ConnectListener onConnect = new ConnectListener() {
 		@Override
 		public void onConnect(SocketIOClient client) {
 			System.out.println("Client connected! " + client.getSessionId());
 			
 			List<Feed> feeds = feedService.findAll();
+			
+			//TODO: send data back to sender
 			nspPost.getClient(client.getSessionId()).sendEvent("all posts", feeds);
 			
 			System.out.println("onConnect - getTransport: "+ client.getTransport());
-			
 		}
 	};
 	
+	//TODO: post status handler
 	private DataListener<Feed> onPostEvent = new DataListener<Feed>() {
 		@Override
 		public void onData(SocketIOClient client, Feed feed, AckRequest ackSender) throws Exception {
 			//TODO: broadcast "new post" to all connected client
 			nspPost.getBroadcastOperations().sendEvent("new post", feed);
 			
-			//TODO: 
+			//TODO: response back to sender
 			ackSender.sendAckData("Message Send!");
 			
 			//TODO: save to database
@@ -85,6 +79,7 @@ public class RealtimeFeedController {
 		}
 	};
 	
+	//TODO: remove post handler
 	private DataListener<String> onRemovePostEvent = new DataListener<String>() {
 		@Override
 		public void onData(SocketIOClient client, String id, AckRequest ackSender) throws Exception {
@@ -95,14 +90,15 @@ public class RealtimeFeedController {
 		}
 	};
 
+	//TODO: like post handler
 	private DataListener<String> onLikePostEvent = new DataListener<String>() {
 		@Override
 		public void onData(SocketIOClient client, String id, AckRequest ackSender) throws Exception {
-			
 			nspPost.getBroadcastOperations().sendEvent("update like", feedService.updateLike(id), id);
 		}
 	};
 	
+	//TODO: disconnect handler
 	private DisconnectListener onDisconnect = new DisconnectListener() {
 		@Override
 		public void onDisconnect(SocketIOClient client) {
@@ -110,10 +106,22 @@ public class RealtimeFeedController {
 		}
 	};
 	
+	//TODO: typing handler
 	private DataListener<String> onTypingEvent = new DataListener<String>() {
 		@Override
 		public void onData(SocketIOClient client, String username, AckRequest ackSender) throws Exception {
-			nspPost.getBroadcastOperations().sendEvent("typing", username);
+			//TODO: send to all connected namespace user exclude sender
+			nspPost.getBroadcastOperations().sendEvent("typing", client, username);
+			
+			//nspPost.getBroadcastOperations().sendEvent("typing", username);
+		}
+	};
+	
+	//TODO: stop typing handler
+	private DataListener<String> onStopTypingEvent = new DataListener<String>() {
+		@Override
+		public void onData(SocketIOClient client, String username, AckRequest ackSender) throws Exception {
+			nspPost.getBroadcastOperations().sendEvent("stop typing", username);
 		}
 	};
 }
