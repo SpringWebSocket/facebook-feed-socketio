@@ -29,20 +29,20 @@ public class ChatController {
 	private ConnectListener onConnectEvent = new ConnectListener() {
 		@Override
 		public void onConnect(SocketIOClient client) {
-			System.out.println("Client connected to /chat namespace! " + client.getSessionId());
+			System.out.println("Connected to /chat namespace! " + client.getSessionId());
 		}
 	};
 	private DisconnectListener onDisconnectEvent = new DisconnectListener() {
 		@Override
 		public void onDisconnect(SocketIOClient client) {
-			System.out.println("Client connected from /chat namespace! " + client.getSessionId());
+			System.out.println("Disconnected from /chat namespace! " + client.getSessionId());
 		}
 	};
 	private DataListener<Chat> onChatEvent = new DataListener<Chat>() {
 		@Override
 		public void onData(SocketIOClient client, Chat chat, AckRequest ackSender) throws Exception {
 			nspChat.getBroadcastOperations().sendEvent("message", chat);
-			System.out.println("onChat: " + chat);
+			System.out.println("Chat /chat namespace: " + chat);
 			ackSender.sendAckData("Message sent!");
 		}
 	};

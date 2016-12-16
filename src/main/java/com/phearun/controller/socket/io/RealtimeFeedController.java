@@ -51,12 +51,13 @@ public class RealtimeFeedController {
 	private ConnectListener onConnect = new ConnectListener() {
 		@Override
 		public void onConnect(SocketIOClient client) {
-			System.out.println("Client connected! " + client.getSessionId());
+			System.out.println("Connected to /post namespace : " + client.getSessionId());
 			
 			List<Feed> feeds = feedService.findAll();
 			
 			//TODO: send data back to sender
-			nspPost.getClient(client.getSessionId()).sendEvent("all posts", feeds);
+			client.sendEvent("all posts", feeds);
+			//nspPost.getClient(client.getSessionId()).sendEvent("all posts", feeds);
 			
 			System.out.println("onConnect - getTransport: "+ client.getTransport());
 		}
@@ -74,7 +75,7 @@ public class RealtimeFeedController {
 			
 			//TODO: save to database
 			feedService.save(feed);
-			
+			System.out.println("Feed /post : " + feed);
 			System.out.println("onPost - getTransport: "+ client.getTransport());
 		}
 	};
@@ -102,7 +103,7 @@ public class RealtimeFeedController {
 	private DisconnectListener onDisconnect = new DisconnectListener() {
 		@Override
 		public void onDisconnect(SocketIOClient client) {
-			System.out.println("Client Disconnected! " + client.getSessionId());
+			System.out.println("Disconnected to /post namespace : " + client.getSessionId());
 		}
 	};
 	

@@ -1,7 +1,5 @@
 package com.phearun.controller.socket.io;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
 import java.io.FileOutputStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,19 +49,27 @@ public class FeedSocketController {
 		//TODO: handle binary data from client
 		this.nspFeed.addEventListener("object", UploadFile.class, onBinaryObjectHandler);
 		
+		//TEST 
+		this.nspFeed.addEventListener("new post", Feed.class, new DataListener<Feed>() {
+			@Override
+			public void onData(SocketIOClient client, Feed data, AckRequest ackSender) throws Exception {
+				System.out.println("Feed /feed : " + data);
+			}
+		});
+		
 	}
 	
 	private ConnectListener onConnect = new ConnectListener() {
 		@Override
 		public void onConnect(SocketIOClient client) {
-			System.out.println("getSessionId: " + client.getSessionId());
+			System.out.println("Connected to /feed namespace : " + client.getSessionId());
 		}
 	};
 	
 	private DisconnectListener onDisconnect = new DisconnectListener() {
 		@Override
 		public void onDisconnect(SocketIOClient client) {
-			System.out.println("getSessionId: " + client.getSessionId());
+			System.out.println("Disonnected to /feed namespace : " + client.getSessionId());
 		}
 	};
 	
