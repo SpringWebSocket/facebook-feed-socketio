@@ -1,8 +1,9 @@
 package com.phearun.controller.socket.io;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
 import java.io.FileOutputStream;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -24,46 +25,32 @@ public class FeedSocketController {
 	
 	@Autowired
 	public FeedSocketController(SocketIOServer server) {
-		//TODO: create feed name space
+		
+		System.out.println("=>Constructing FeedSocketController...");
+		
+		//TODO: creating /feed name space
 		this.nspFeed = server.addNamespace("/feed");
-		
-		//TODO: onConnect event listener
-		this.nspFeed.addConnectListener(onConnect);
-		
-		//TODO: onDisconnect event listener
-		this.nspFeed.addDisconnectListener(onDisconnect);
-		
-		//TODO: onCustom event listener
-		this.nspFeed.addEventListener("message", Feed.class, onFeed);
-		
-		//TODO: handle client join room
-		this.nspFeed.addEventListener("join", String.class, onJoinRoom);
-		
-		//TODO: handle client leave room
-		this.nspFeed.addEventListener("leave", String.class, onLeaveRoom);
-
-		//TODO: client message to room
-		this.nspFeed.addEventListener("toroom", String.class, onSendMessageToRoom);
-	
-		//TODO: handle binary data from client
-		this.nspFeed.addEventListener("binary", byte[].class, onBinaryHandler);
-		
-		//TODO: handle binary data from client
-		this.nspFeed.addEventListener("object", UploadFile.class, onBinaryObjectHandler);
+		//TEST 
+		this.nspFeed.addEventListener("new post", Feed.class, new DataListener<Feed>() {
+			@Override
+			public void onData(SocketIOClient client, Feed data, AckRequest ackSender) throws Exception {
+				System.out.println("Feed /feed : " + data);
+			}
+		});
 		
 	}
 	
 	private ConnectListener onConnect = new ConnectListener() {
 		@Override
 		public void onConnect(SocketIOClient client) {
-			System.out.println("getSessionId: " + client.getSessionId());
+			System.out.println("Connected to /feed namespace : " + client.getSessionId());
 		}
 	};
 	
 	private DisconnectListener onDisconnect = new DisconnectListener() {
 		@Override
 		public void onDisconnect(SocketIOClient client) {
-			System.out.println("getSessionId: " + client.getSessionId());
+			System.out.println("Disonnected to /feed namespace : " + client.getSessionId());
 		}
 	};
 	
@@ -111,13 +98,13 @@ public class FeedSocketController {
 		public void onData(SocketIOClient client, byte[] data, AckRequest ackSender) throws Exception {
 			System.out.println("binary data: " + data);
 			
-			FileOutputStream fos = new FileOutputStream("test.html");
+			/*FileOutputStream fos = new FileOutputStream("test.html");
 			fos.write(data);
-			fos.close();
+			fos.close();*/
 			
-			BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(new File("test.png")));
+			/*BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(new File("test.png")));
 			bos.write(data);
-			bos.close();
+			bos.close();*/
 		}
 			
 	};
@@ -126,7 +113,51 @@ public class FeedSocketController {
 		@Override
 		public void onData(SocketIOClient client, UploadFile uploadFile, AckRequest ackSender) throws Exception {
 			System.out.println("binary data: " + uploadFile);
+			nspFeed.getBroadcastOperations().sendEvent("test", uploadFile.getFile());
 		}
 			
 	};
+	
+	@PostConstruct
+	public void init(){
+		
+		System.out.println("=>Initializing event listener...");
+		
+		//TODO: onConnect event listener
+		this.nspFeed.addConnectListener(onConnect);
+		
+		//TODO: onDisconnect event listener
+		this.nspFeed.addDisconnectListener(onDisconnect);
+		
+		//TODO: onCustom event listener
+		this.nspFeed.addEventListener("message", Feed.class, onFeed);
+		
+		//TODO: handle client join room
+		this.nspFeed.addEventListener("join", String.class, onJoinRoom);
+		
+		//TODO: handle client leave room
+		this.nspFeed.addEventListener("leave", String.class, onLeaveRoom);
+
+		//TODO: client message to room
+		this.nspFeed.addEventListener("toroom", String.class, onSendMessageToRoom);
+	
+		//TODO: handle binary data from client
+		this.nspFeed.addEventListener("binary", byte[].class, onBinaryHandler);
+		
+		//TODO: handle binary data from client
+		this.nspFeed.addEventListener("object", UploadFile.class, onBinaryObjectHandler);
+	}
+	
+	@PreDestroy
+	public void destroy(){
+		
+		System.out.println("=>Removing event listener from FeedSocketController...");
+		
+		this.nspFeed.removeAllListeners("message");
+		this.nspFeed.removeAllListeners("join");
+		this.nspFeed.removeAllListeners("leave");
+		this.nspFeed.removeAllListeners("toroom");
+		this.nspFeed.removeAllListeners("binary");
+		this.nspFeed.removeAllListeners("object");
+	}
 }
