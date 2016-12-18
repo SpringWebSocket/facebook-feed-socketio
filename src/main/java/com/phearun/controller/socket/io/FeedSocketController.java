@@ -147,9 +147,7 @@ public class FeedSocketController {
 	
 	@PreDestroy
 	public void destroy(){
-		
 		System.out.println("=>Removing event listener from FeedSocketController...");
-		
 		this.nspFeed.removeAllListeners("message");
 		this.nspFeed.removeAllListeners("join");
 		this.nspFeed.removeAllListeners("leave");

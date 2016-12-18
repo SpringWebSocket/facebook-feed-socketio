@@ -1,5 +1,6 @@
 package com.phearun.controller.socket.io;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,12 +14,15 @@ import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.listener.DataListener;
 import com.corundumstudio.socketio.listener.DisconnectListener;
 import com.phearun.model.Feed;
+import com.phearun.model.User;
 import com.phearun.service.FeedService;
 
 @Component
 public class RealtimeFeedController {
 
 	private SocketIONamespace nspPost;
+	
+	private ArrayList<User> allUsers = new ArrayList<>();
 	
 	@Autowired
 	private FeedService feedService;
@@ -45,6 +49,8 @@ public class RealtimeFeedController {
 		
 		//TODO: listening on "typing " event 
 		this.nspPost.addEventListener("stop typing", String.class, onStopTypingEvent );
+		
+		this.nspPost.addEventListener("new user", User.class, onNewUserEvent );
 	}
 	
 	//TODO: connect handler
@@ -54,11 +60,11 @@ public class RealtimeFeedController {
 			System.out.println("Connected to /post namespace : " + client.getSessionId());
 			
 			List<Feed> feeds = feedService.findAll();
-			
-			//TODO: send data back to sender
-			client.sendEvent("all posts", feeds);
-			//nspPost.getClient(client.getSessionId()).sendEvent("all posts", feeds);
-			
+			if(!feeds.isEmpty()){
+				//TODO: send data back to sender
+				client.sendEvent("all posts", feeds);
+				//nspPost.getClient(client.getSessionId()).sendEvent("all posts", feeds);				
+			}
 			System.out.println("onConnect - getTransport: "+ client.getTransport());
 		}
 	};
@@ -67,14 +73,17 @@ public class RealtimeFeedController {
 	private DataListener<Feed> onPostEvent = new DataListener<Feed>() {
 		@Override
 		public void onData(SocketIOClient client, Feed feed, AckRequest ackSender) throws Exception {
-			//TODO: broadcast "new post" to all connected client
-			nspPost.getBroadcastOperations().sendEvent("new post", feed);
-			
-			//TODO: response back to sender
-			ackSender.sendAckData("Message Send!");
 			
 			//TODO: save to database
-			feedService.save(feed);
+			if(feedService.save(feed)){
+				
+				//TODO: broadcast "new post" to all connected client
+				nspPost.getBroadcastOperations().sendEvent("new post", feed);
+				
+				//TODO: response back to sender
+				ackSender.sendAckData("Status Posted!");
+			}
+			
 			System.out.println("Feed /post : " + feed);
 			System.out.println("onPost - getTransport: "+ client.getTransport());
 		}
@@ -103,6 +112,10 @@ public class RealtimeFeedController {
 	private DisconnectListener onDisconnect = new DisconnectListener() {
 		@Override
 		public void onDisconnect(SocketIOClient client) {
+			allUsers.remove(User.findById(allUsers, client.getSessionId()));
+			
+			nspPost.getBroadcastOperations().sendEvent("user offline", client, client.getSessionId());
+			
 			System.out.println("Disconnected to /post namespace : " + client.getSessionId());
 		}
 	};
@@ -123,6 +136,17 @@ public class RealtimeFeedController {
 		@Override
 		public void onData(SocketIOClient client, String username, AckRequest ackSender) throws Exception {
 			nspPost.getBroadcastOperations().sendEvent("stop typing", username);
+		}
+	};
+	
+	//TODO: new user
+	private DataListener<User> onNewUserEvent = new DataListener<User>() {
+		@Override
+		public void onData(SocketIOClient client, User user, AckRequest ackSender) throws Exception {
+			if(allUsers.add(user)){
+				nspPost.getBroadcastOperations().sendEvent("new user", client, user);				
+				ackSender.sendAckData(allUsers);
+			}
 		}
 	};
 }
