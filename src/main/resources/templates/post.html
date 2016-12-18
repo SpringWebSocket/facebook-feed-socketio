@@ -85,15 +85,10 @@
 		<div id="typing"></div>
 		<div id="posts"></div>
 	</div>
-
 	<script>
-    
 	    "use strict";
-	
 	    var username = prompt("What is your name?", "Anonymous" + Math.floor(Math.random() * 100));
-	
 	    var Post = {};
-	
 	    var socketServerUrl = location.protocol + "//" + location.hostname + ":3000";
 	    var nspPost = socketServerUrl + "/post";
 	
@@ -116,86 +111,11 @@
 	        socket.emit('typing', username);
 	
 	        clearTimeout(typingTimer);
-	
-	<script src="/static/js/socket.io/socket.io.js"></script>
-    <script src="/static/js/jquery-1.7.2.min.js"></script>
-    <script>
-    
-    	var username = prompt("What is your name?", "Anonymous" + Math.floor(Math.random()*100));	
-
-    	var Post = {};
-    	
-    	var socketServerUrl = `${location.protocol}//${location.hostname}:4000`;
-   		var nspPost = `${socketServerUrl}/post`;
-   		
-		var socket =  io.connect(nspPost);
-		var typingTimer;
-    	socket.on('connect', function(){
-			console.log('connected to server', socket.id);
-			
-			$('button#btnPost').on('click', function(){
-				socket.emit('new post', {username: username, text: $('#statusText').val()});
-			});
-			
-			$('textarea#statusText').on('keyup', function(){
-	    		socket.emit('typing', username);
-	    		clearTimeout(typingTimer);
-				typingTimer = setTimeout(function(){
-					socket.emit('stop typing', username);
-				}, 2000);
-	    	});
-		});   
-    	
-    	socket.on('all posts', function(datas){
-    		var post = ``;
-    		datas.forEach(function(data, index){
-    			post += Post.render(data);
-    		});
-			$('div#posts').html(post);
-    	});
-    	
-    	socket.on('new post', function(data){
-    		var post = Post.render(data);
-    		$('div#posts').prepend(post);
-    	});
-    	
-    	socket.on('update like', function(like, id){
-    		console.log(arguments);
-			$(`#like${id}`).html(like);
-    	});
-    	
-    	socket.on('removed post', function(id){
-			$(`#${id}`).parent().remove();
-    	});
-    	
-    	socket.on('typing', function(username){
-    		console.log(username, 'is typing...!');
-    		$('#txtStatus').val('...');
-    	});
-    	
-		socket.on('stop typing', function(username){
-    		console.log(username, 'stop typing...!');
-    	});
-    	
-    	Post.render = function(data){
-    		return `<div class="post">
-    					<p>${data.username}</p><hr>
-						<h3>${data.text}</h3>
-						<button id="${data.id}" onClick="Post.like(this)" class="btn btn-primary"><span id="like${data.id}">${data.like}</span> Like</button>
-						<button id="${data.id}" onClick="Post.remove(this)" class="btn btn-danger">Remove</button>
-					</div>`;	
-    	}
-    	
-    	Post.remove = function(button){
-        	socket.emit('remove post', button.id);	
-    	}
-    	
-    	Post.like = function(button){
-    		socket.emit('like post', button.id);
-    	}
+	        
 	        typingTimer = setTimeout(function () {
 	          socket.emit('stop typing', username);
 	        }, 1000);
+	        
 	      });
 	    });
 	

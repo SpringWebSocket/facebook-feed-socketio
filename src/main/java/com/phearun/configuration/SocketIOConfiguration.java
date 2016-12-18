@@ -24,6 +24,10 @@ public class SocketIOConfiguration {
 	    socketConfig.setHostname(SOCKET_IO_HOST);
 	    socketConfig.setPort(SOCKET_IO_PORT);
 	    
+	    socketConfig.getTransports().forEach(transport->{
+	    	System.out.println("Supported Transport: " + transport.name());
+	    });
+	    //TODO: set the maximum payload data 
 	    socketConfig.setMaxFramePayloadLength(1*1024*1024); // megabytes * kilobytes * bytes
 	    
 	    return socketConfig;

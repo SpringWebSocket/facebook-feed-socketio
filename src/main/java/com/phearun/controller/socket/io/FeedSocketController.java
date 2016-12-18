@@ -1,7 +1,5 @@
 package com.phearun.controller.socket.io;
 
-import java.io.FileOutputStream;
-
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
@@ -37,7 +35,6 @@ public class FeedSocketController {
 				System.out.println("Feed /feed : " + data);
 			}
 		});
-		
 	}
 	
 	private ConnectListener onConnect = new ConnectListener() {

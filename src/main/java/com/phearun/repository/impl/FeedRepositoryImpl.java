@@ -19,7 +19,9 @@ public class FeedRepositoryImpl implements FeedRepository {
 
 	@Override
 	public boolean save(Feed feed) {
-		return feeds.add(feed);
+		feeds.add(0, feed);
+		//return feeds.add(feed);
+		return true;
 	}
 
 	@Override
