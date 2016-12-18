@@ -143,10 +143,9 @@ public class RealtimeFeedController {
 	private DataListener<User> onNewUserEvent = new DataListener<User>() {
 		@Override
 		public void onData(SocketIOClient client, User user, AckRequest ackSender) throws Exception {
-			if(allUsers.add(user)){
-				nspPost.getBroadcastOperations().sendEvent("new user", client, user);				
-				ackSender.sendAckData(allUsers);
-			}
+			allUsers.add(0, user);
+			nspPost.getBroadcastOperations().sendEvent("new user", client, user);				
+			ackSender.sendAckData(allUsers);
 		}
 	};
 }

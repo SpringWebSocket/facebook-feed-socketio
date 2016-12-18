@@ -1,111 +1,15 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<title>Facebook Feed | SocketIOSpring</title>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-	<style>
-		* {
-			padding: 0px;
-			margin: 0 auto;
-			box-sizing: border-box;
-		}
-		
-		hr {
-			margin: 0px 0px 5px 0px;
-			border-top: 1px solid #fff;
-		}
-		
-		h3 {
-			margin-top: 0px;
-		}
-		
-		.container {
-			width: 500px;
-		}
-		
-		div.post {
-			background-color: #E8EAF6;
-			width: 100%;
-			margin-bottom: 10px;
-			padding: 5px;
-			border-radius: 2px;
-		}
-		div.post img{
-			width:100%;
-		}
-		
-		div#status {
-			margin-bottom: 40px;
-		}
-		
-		#status textarea {
-			margin-top: 5px;
-			width: 100%;
-			border: 1px solid #658aca;
-			padding: 5px;
-		}
-		
-		.header {
-			z-index:10000;
-			background-color: #3e62a0;
-			min-height: 50px;
-			color: #fff;
-		}
-		
-		.header p {
-			padding: 15px;
-		}
-		
-		div.typingStatus {
-			width: 100%;
-			min-height: 50px;
-			margin-bottom: 10px;
-		}
-		
-		div.typingStatus img {
-			width: 100%;
-			height: 50px;
-			border: 1px solid #e8eaf6;
-		}
-		button.btn-danger{
-			margin-left: 2px;
-		}
-		div.online-user{
-			margin-top:50px;
-			background-color:#e9ebee;
-			width:200px;
-			height:100%;
-			position:fixed;
-			right:0px;
-			top:0px;
-			z-index:-100;
-		}
-		.user{
-			padding:10px 10px 0px 10px;
-			border-bottom:1px solid #e9ebee;
-		}
-		img.profile{
-			width:30px;
-			height:30px;
-		}
-		img.online-status{
-			width:8px;
-			height:8px;
-			float:right;
-			top:10px;
-			position:relative;
-		}
-	</style>
-	<script src="/static/js/socket.io/socket.io.js"></script>
-	<script src="/static/js/jquery-1.7.2.min.js"></script>
+	<title>Facebook Feed | SocketIOSpring</title>	
+	<link rel="stylesheet" href="/static/css/bootstrap.min.css">
+	<link rel="stylesheet" href="/static/css/post.css">
 </head>
 <body>
-	<div class="header">
-		<p>KSHRD CENTER</p>
-	</div>
+	<div class="header"><p>Socket.IO Web Client</p></div>
 	<div class="container">
-		<div class="feed">
+		<div class="col-sm-3"></div>
+		<div class="col-sm-6">
 			<div id="status">
 				<textarea id="statusText" placeholder="What's on your mind?"></textarea>
 				<button id="btnPost" class="pull-right btn btn-primary">Post</button>
@@ -113,113 +17,12 @@
 			<div id="typing"></div>
 			<div id="posts"></div>
 		</div>
+		<div class="col-sm-3"></div>
 		<div class="online-user"></div>
 	</div>
-	<script>
-	    "use strict";
-	    var username = prompt("What is your name?", "Anonymous" + Math.floor(Math.random() * 100));
-	    var Post = {};
-	    var User = {};
-	    
-	    var socketServerUrl = location.protocol + "//" + location.hostname + ":23456";
-	    var nspPost = socketServerUrl + "/post";
 	
-	    var socketOptions = {
-	      upgrade: false,
-	      transports: ['websocket', 'flashsocket', 'htmlfile', 'xhr-polling', 'jsonp-polling']
-	    };
-	    var socket = io.connect(nspPost/* , socketOptions */);
-	    var typingTimer;
-	    
-	    socket.on('connect', function () {
-	      	console.log('connected to server', socket.id);
-	      	
-	      	socket.emit('new user', { id: socket.id, username: username}, function(users){
-	      		console.log('all users:', users);
-	      		var htmlUsers = ``;
-				users.forEach(function(user){
-					 htmlUsers += User.render(user);
-				});
-				$('div.online-user').html(htmlUsers);
-	      	});
-	
-	      	$('button#btnPost').on('click', function () {
-		        socket.emit('new post', { username: username, text: $('#statusText').val() });
-	 	    });
-	
-	     	$('textarea#statusText').on('keyup', function () {
-	        	socket.emit('typing', username);
-	        	clearTimeout(typingTimer);
-	        
-	        	typingTimer = setTimeout(function () {
-	          		socket.emit('stop typing', username);
-	        	}, 1000);
-	      	});
-	    });
-	
-	    socket.on('all posts', function (datas) {
-	      console.log(arguments);
-	      var post = "";
-	      datas.forEach(function (data, index) {
-	        	post += Post.render(data);
-	      });
-	      $('div#posts').html(post);
-	    });
-	
-	    socket.on('new post', function (data) {
-	      $('div#posts').prepend(Post.render(data));
-	      $('textarea#statusText').val('');
-	    });
-	
-	    socket.on('update like', function (like, id) {
-	      console.log(arguments);
-	      $("#like" + id).html(like);
-	    });
-	
-	    socket.on('removed post', function (id) {
-	      $("#" + id).parent().remove();
-	    });
-	
-	    socket.on('typing', function (username) {
-	        console.log(username, 'is typing...!');
-	        var html = '<div class="typingStatus"><img src="/static/images/comment-pink.svg"></div>';
-	        $('div#typing').html(html);
-	    });
-	
-	    socket.on('stop typing', function (username) {
-	      console.log(username, 'stop typing...!');
-	      $('div#typing').find('div').remove();
-	    });
-	
-	    Post.render = function (data) {
-	        return "<div class=\"post\"><p>" + data.username + "</p><hr><h3>" + data.text + "</h3><button id=\"" + data.id + "\" onClick=\"Post.like(this)\" class=\"btn btn-primary\"><span id=\"like" + data.id + "\">" + data.like + "</span> Like</button><button id=\"" + data.id + "\" onClick=\"Post.remove(this)\" class=\"btn btn-danger\">Remove</button></div>";
-	    };
-	
-	    Post.remove = function (button) {
-	      	socket.emit('remove post', button.id);
-	    };
-	
-	    Post.like = function (button) {
-	      	socket.emit('like post', button.id);
-	    };
-	
-	    //TODO: user's block
-	    socket.on('new user', function(user){
-			console.log('new user:', user);
-			$('div.online-user').prepend(User.render(user));
-	    });
-	    
-	    socket.on('user offline', function(userId){
-	    	$(`span#${userId}`).parent().remove();
-	    });
-	    
-	   	User.render = function(user){
-	    	return `<div class="user">
-						<img class="profile" src="/static/images/img.svg">
-						<span id="${user.id}">${user.username}</span>
-						<img class="online-status" src="/static/images/online-status.svg">
-					</div>`;
-	    };
-    </script>
+	<script src="/static/js/jquery.min.js"></script>
+	<script src="/static/js/socket.io/socket.io.js"></script>
+	<script src="/static/js/post.js"></script>
 </body>
 </html>
