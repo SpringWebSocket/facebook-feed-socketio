@@ -1,7 +1,8 @@
 package com.phearun.controller.socket.io;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -17,12 +18,14 @@ import com.phearun.model.Feed;
 import com.phearun.model.User;
 import com.phearun.service.FeedService;
 
+
 @Component
 public class RealtimeFeedController {
 
 	private SocketIONamespace nspPost;
 	
-	private ArrayList<User> allUsers = new ArrayList<>();
+	//private ArrayList<User> allUsers = new ArrayList<>();
+	private Map<SocketIOClient, User> allUsers = new HashMap<>();
 	
 	@Autowired
 	private FeedService feedService;
@@ -112,7 +115,8 @@ public class RealtimeFeedController {
 	private DisconnectListener onDisconnect = new DisconnectListener() {
 		@Override
 		public void onDisconnect(SocketIOClient client) {
-			allUsers.remove(User.findById(allUsers, client.getSessionId()));
+			//allUsers.remove(User.findById(allUsers, client.getSessionId()));
+			allUsers.remove(client);
 			
 			nspPost.getBroadcastOperations().sendEvent("user offline", client, client.getSessionId());
 			
@@ -143,9 +147,13 @@ public class RealtimeFeedController {
 	private DataListener<User> onNewUserEvent = new DataListener<User>() {
 		@Override
 		public void onData(SocketIOClient client, User user, AckRequest ackSender) throws Exception {
-			allUsers.add(0, user);
-			nspPost.getBroadcastOperations().sendEvent("new user", client, user);				
-			ackSender.sendAckData(allUsers);
+			allUsers.put(client, user);
+			//allUsers.add(0, user);
+			
+			nspPost.getBroadcastOperations().sendEvent("new user", client, user);
+			
+			//ackSender.sendAckData(allUsers);
+			ackSender.sendAckData(allUsers.values());
 		}
 	};
 }
