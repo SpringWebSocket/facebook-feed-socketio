@@ -4,7 +4,7 @@
 	var Post = {};
 	var User = {};
 	
-	var socketServerUrl = location.protocol + "//" + location.hostname + ":3000";
+	var socketServerUrl = location.protocol + "//" + location.hostname + ":23456";
 	var nspPost = socketServerUrl + "/post";
 	
 	var socketOptions = {
