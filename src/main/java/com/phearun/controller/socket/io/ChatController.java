@@ -24,6 +24,7 @@ public class ChatController {
 		this.nspChat.addConnectListener(onConnectEvent);
 		this.nspChat.addDisconnectListener(onDisconnectEvent);
 		this.nspChat.addEventListener("message", Chat.class, onChatEvent);
+		this.nspChat.addEventListener("new user", String.class, onNewUserEvent );
 	}
 	
 	private ConnectListener onConnectEvent = new ConnectListener() {
@@ -47,4 +48,10 @@ public class ChatController {
 		}
 	};
 	
+	private DataListener<String> onNewUserEvent = new DataListener<String>() {
+		@Override
+		public void onData(SocketIOClient client, String username, AckRequest ackSender) throws Exception {
+			nspChat.getBroadcastOperations().sendEvent("new user", username);
+		}
+	};
 }
