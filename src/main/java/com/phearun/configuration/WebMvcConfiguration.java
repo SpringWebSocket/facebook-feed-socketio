@@ -13,6 +13,8 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
 	public void addViewControllers(ViewControllerRegistry registry) {
 		registry.addViewController("/").setViewName("/index");
 		registry.addViewController("/post").setViewName("/post");
+
+		registry.addViewController("/chat").setViewName("/chat");
 	}
 
 	@Override

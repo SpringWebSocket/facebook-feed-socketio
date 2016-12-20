@@ -62,6 +62,8 @@ public class RealtimeFeedController {
 		public void onConnect(SocketIOClient client) {
 			System.out.println("Connected to /post namespace : " + client.getSessionId());
 			
+			client.set("myname", "Phearun");
+			
 			List<Feed> feeds = feedService.findAll();
 			if(!feeds.isEmpty()){
 				//TODO: send data back to sender
@@ -76,7 +78,7 @@ public class RealtimeFeedController {
 	private DataListener<Feed> onPostEvent = new DataListener<Feed>() {
 		@Override
 		public void onData(SocketIOClient client, Feed feed, AckRequest ackSender) throws Exception {
-			
+			System.out.println("Name: " + client.get("myname"));
 			//TODO: save to database
 			if(feedService.save(feed)){
 				

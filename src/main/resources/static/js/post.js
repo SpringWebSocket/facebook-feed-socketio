@@ -4,7 +4,7 @@
 	var Post = {};
 	var User = {};
 	
-	var socketServerUrl = location.protocol + "//" + location.hostname + ":23456";
+	var socketServerUrl = location.protocol + "//" + location.hostname + ":3000";
 	var nspPost = socketServerUrl + "/post";
 	
 	var socketOptions = {
@@ -17,6 +17,8 @@
 	socket.on('connect', function () {
 	  	console.log('connected to server', socket.id);
 	  	socket.emit('new user', { id: socket.id, username: username}, function(users){
+	  		console.log("socket", socket.myname);
+	  		
 	  		console.log('all users:', users);
 	  		var htmlUsers = ``;
 			users.forEach(function(user){
