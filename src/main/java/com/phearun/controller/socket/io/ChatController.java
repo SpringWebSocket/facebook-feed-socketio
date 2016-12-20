@@ -1,5 +1,8 @@
 package com.phearun.controller.socket.io;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +19,7 @@ import com.phearun.model.Chat;
 public class ChatController {
 
 	private SocketIONamespace nspChat;
+	private Map<SocketIOClient, String> chatUsers = new HashMap<>();
 	
 	@Autowired
 	public ChatController(SocketIOServer server){
@@ -24,7 +28,9 @@ public class ChatController {
 		this.nspChat.addConnectListener(onConnectEvent);
 		this.nspChat.addDisconnectListener(onDisconnectEvent);
 		this.nspChat.addEventListener("message", Chat.class, onChatEvent);
-		this.nspChat.addEventListener("new user", String.class, onNewUserEvent );
+		this.nspChat.addEventListener("join", String.class, onUserJoinEvent);
+		this.nspChat.addEventListener("typing", String.class, onUserTypingEvent);
+		this.nspChat.addEventListener("stop typing", String.class, onUserStopTypingEvent);
 	}
 	
 	private ConnectListener onConnectEvent = new ConnectListener() {
@@ -33,25 +39,46 @@ public class ChatController {
 			System.out.println("Connected to /chat namespace! " + client.getSessionId());
 		}
 	};
+	
 	private DisconnectListener onDisconnectEvent = new DisconnectListener() {
 		@Override
 		public void onDisconnect(SocketIOClient client) {
+			nspChat.getBroadcastOperations().sendEvent("leave", chatUsers.get(client));
+			chatUsers.remove(client);			
 			System.out.println("Disconnected from /chat namespace! " + client.getSessionId());
 		}
 	};
+	
 	private DataListener<Chat> onChatEvent = new DataListener<Chat>() {
 		@Override
 		public void onData(SocketIOClient client, Chat chat, AckRequest ackSender) throws Exception {
-			nspChat.getBroadcastOperations().sendEvent("message", chat);
+			nspChat.getBroadcastOperations().sendEvent("message", client, chat);
 			System.out.println("Chat /chat namespace: " + chat);
 			ackSender.sendAckData("Message sent!");
 		}
 	};
 	
-	private DataListener<String> onNewUserEvent = new DataListener<String>() {
+	private DataListener<String> onUserJoinEvent = new DataListener<String>() {
 		@Override
 		public void onData(SocketIOClient client, String username, AckRequest ackSender) throws Exception {
-			nspChat.getBroadcastOperations().sendEvent("new user", username);
+			chatUsers.put(client, username);
+			nspChat.getBroadcastOperations().sendEvent("join", username);
 		}
 	};
+	
+	private DataListener<String> onUserTypingEvent = new DataListener<String>() {
+		@Override
+		public void onData(SocketIOClient client, String username, AckRequest ackSender) throws Exception {
+			nspChat.getBroadcastOperations().sendEvent("typing", client, username);
+		}
+	};
+
+	private DataListener<String> onUserStopTypingEvent = new DataListener<String>() {
+		@Override
+		public void onData(SocketIOClient client, String username, AckRequest ackSender) throws Exception {
+			nspChat.getBroadcastOperations().sendEvent("stop typing", client, username);
+		}
+	};
+	
+	
 }

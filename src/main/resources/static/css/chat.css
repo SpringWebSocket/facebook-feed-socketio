@@ -9,6 +9,24 @@
 	max-height: 50px;
 	color: #fff;
 }
+div.self p{
+	float:right;
+	clear:both;
+	padding:5px;
+	color:#fff;
+	background-color:rgba(71, 117, 195, 0.85);
+	border-radius: 50px;
+	background-color:rgba(239, 94, 94, 0.85);
+	
+}
+div.other p{
+	clear:both;
+	float:left;
+	padding:5px;
+	color:#fff;
+	background-color:rgba(71, 117, 195, 0.85);
+	border-radius: 50px;	
+}
 
 .header p {
 	padding: 15px;
@@ -16,16 +34,36 @@
 
 .chat-box{
 	background-color:#dadada;
-	margin-top:50px;	
-	min-height:500px;
-	max-height:500px;
-	overflow-y:scroll;
+	margin-top:52px;
+	padding:0px;
 }
 div#chatBox{
 	padding:10px;
+	min-height:500px;
+	max-height:500px;
+	overflow: auto;
 }
 
 #txtMessage{
-	margin-top:5px;
+	padding:5px;
+	margin-top:2px;
+	bottom:0px;
 	width:100%;
+	border:1px solid rgba(218, 218, 218, 0.57);
 }
+
+p.join, p.left, p.typing{
+	clear:both;
+	background-color:#77b975;
+	border-radius: 0% 100% 0% 100%;
+	color:#fff;
+	padding:5px;
+}
+p.left{
+	background-color:#d28181;
+}
+
+p.typing{
+	background-color:blue;
+}
+
