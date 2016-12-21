@@ -33,7 +33,7 @@ div.other p{
 }
 
 .chat-box{
-	background-color:#dadada;
+	background-color:rgba(70, 139, 255, 0.11);
 	margin-top:52px;
 	padding:0px;
 }
@@ -60,10 +60,10 @@ p.join, p.left, p.typing{
 	padding:5px;
 }
 p.left{
-	background-color:#d28181;
+	background-color:#ee7476;
 }
 
 p.typing{
-	background-color:blue;
+	background-color:#F06292;
 }
 
