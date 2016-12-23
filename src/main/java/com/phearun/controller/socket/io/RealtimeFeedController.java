@@ -3,6 +3,8 @@ package com.phearun.controller.socket.io;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -24,7 +26,7 @@ public class RealtimeFeedController {
 
 	private SocketIONamespace nspPost;
 	
-	//private ArrayList<User> allUsers = new ArrayList<>();
+	//TODO: store all connected user on memory
 	private Map<SocketIOClient, User> allUsers = new HashMap<>();
 	
 	@Autowired
@@ -33,9 +35,13 @@ public class RealtimeFeedController {
 	@Autowired
 	public RealtimeFeedController(SocketIOServer server) {
 		
+		//TODO: let server listen to /post namespace
 		this.nspPost = server.addNamespace("/post");
 		
+		//TODO: fired after the client established the connection
 		this.nspPost.addConnectListener(onConnect);
+		
+		//TODO: fired after the client disconnect from the server
 		this.nspPost.addDisconnectListener(onDisconnect);
 		
 		//TODO: listening on "new post" event
@@ -53,6 +59,7 @@ public class RealtimeFeedController {
 		//TODO: listening on "typing " event 
 		this.nspPost.addEventListener("stop typing", String.class, onStopTypingEvent );
 		
+		//TODO: listening on "new user" event
 		this.nspPost.addEventListener("new user", User.class, onNewUserEvent );
 	}
 	
@@ -60,16 +67,29 @@ public class RealtimeFeedController {
 	private ConnectListener onConnect = new ConnectListener() {
 		@Override
 		public void onConnect(SocketIOClient client) {
-			System.out.println("Connected to /post namespace : " + client.getSessionId());
 			
-			client.set("myname", "Phearun");
+			System.out.println("Connected to /post namespace : " + client.getSessionId());
 			
 			List<Feed> feeds = feedService.findAll();
 			if(!feeds.isEmpty()){
+				System.out.println("Sending!!!");
+				
 				//TODO: send data back to sender
-				client.sendEvent("all posts", feeds);
-				//nspPost.getClient(client.getSessionId()).sendEvent("all posts", feeds);				
+				//client.sendEvent("all posts", feeds);
+				//or nspPost.getClient(client.getSessionId()).sendEvent("all posts", feeds);		
+				
+				//TODO: problem with iOS, can't receive event immediately. for android use above code, it works fine
+				//delay 1 second before send back to the current connected client
+				new Timer().schedule(new TimerTask() {
+					@Override
+					public void run() {
+						//send to current connected client only
+						//or client.sendEvent("all posts", feeds);
+						nspPost.getClient(client.getSessionId()).sendEvent("all posts", feeds);
+					}
+				}, 1000);
 			}
+			
 			System.out.println("onConnect - getTransport: "+ client.getTransport());
 		}
 	};
@@ -78,7 +98,7 @@ public class RealtimeFeedController {
 	private DataListener<Feed> onPostEvent = new DataListener<Feed>() {
 		@Override
 		public void onData(SocketIOClient client, Feed feed, AckRequest ackSender) throws Exception {
-			System.out.println("Name: " + client.get("myname"));
+			
 			//TODO: save to database
 			if(feedService.save(feed)){
 				
@@ -99,7 +119,7 @@ public class RealtimeFeedController {
 		@Override
 		public void onData(SocketIOClient client, String id, AckRequest ackSender) throws Exception {
 			if(feedService.remove(id)){
-				//nspPost.getBroadcastOperations().sendEvent("all posts", feedService.findAll());
+				//send to all connected client
 				nspPost.getBroadcastOperations().sendEvent("removed post", id);
 			}
 		}
@@ -109,6 +129,7 @@ public class RealtimeFeedController {
 	private DataListener<String> onLikePostEvent = new DataListener<String>() {
 		@Override
 		public void onData(SocketIOClient client, String id, AckRequest ackSender) throws Exception {
+			//TODO send multiple payload to client (like and id)
 			nspPost.getBroadcastOperations().sendEvent("update like", feedService.updateLike(id), id);
 		}
 	};
@@ -117,10 +138,12 @@ public class RealtimeFeedController {
 	private DisconnectListener onDisconnect = new DisconnectListener() {
 		@Override
 		public void onDisconnect(SocketIOClient client) {
-			//allUsers.remove(User.findById(allUsers, client.getSessionId()));
+			
+			//TODO: remove user
 			allUsers.remove(client);
 			
-			nspPost.getBroadcastOperations().sendEvent("user offline", client, client.getSessionId());
+			//send to all connected client
+			nspPost.getBroadcastOperations().sendEvent("user offline", client.getSessionId());
 			
 			System.out.println("Disconnected to /post namespace : " + client.getSessionId());
 		}
@@ -130,10 +153,9 @@ public class RealtimeFeedController {
 	private DataListener<String> onTypingEvent = new DataListener<String>() {
 		@Override
 		public void onData(SocketIOClient client, String username, AckRequest ackSender) throws Exception {
+			
 			//TODO: send to all connected namespace user exclude sender
 			nspPost.getBroadcastOperations().sendEvent("typing", client, username);
-			
-			//nspPost.getBroadcastOperations().sendEvent("typing", username);
 		}
 	};
 	
@@ -141,20 +163,23 @@ public class RealtimeFeedController {
 	private DataListener<String> onStopTypingEvent = new DataListener<String>() {
 		@Override
 		public void onData(SocketIOClient client, String username, AckRequest ackSender) throws Exception {
-			nspPost.getBroadcastOperations().sendEvent("stop typing", username);
+			//TODO: send to all connected client exclude sender
+			nspPost.getBroadcastOperations().sendEvent("stop typing", client, username);
 		}
 	};
 	
-	//TODO: new user
+	//TODO: new user event handler
 	private DataListener<User> onNewUserEvent = new DataListener<User>() {
 		@Override
 		public void onData(SocketIOClient client, User user, AckRequest ackSender) throws Exception {
-			allUsers.put(client, user);
-			//allUsers.add(0, user);
 			
+			//add new user to map
+			allUsers.put(client, user);
+			
+			//send to all connected client exclude sender
 			nspPost.getBroadcastOperations().sendEvent("new user", client, user);
 			
-			//ackSender.sendAckData(allUsers);
+			//TODO: send acknowledgement back to the sender ( response back to the sender)
 			ackSender.sendAckData(allUsers.values());
 		}
 	};

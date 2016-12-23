@@ -22,18 +22,14 @@ public class SocketIOConfiguration {
 	public com.corundumstudio.socketio.Configuration socketConfig(){
 		com.corundumstudio.socketio.Configuration socketConfig = new com.corundumstudio.socketio.Configuration();
 		
-		if(System.getenv("PORT")!=null){
-			System.out.println("PORT: " + System.getenv("PORT"));
-			SOCKET_IO_PORT = Integer.valueOf(System.getenv("PORT"));
-			SOCKET_IO_HOST = "spring-pagination.herokuapp.com";
-		}
-		
 	    socketConfig.setHostname(SOCKET_IO_HOST);
 	    socketConfig.setPort(SOCKET_IO_PORT);
 	    
+	    //TODO: get all supported transports
 	    socketConfig.getTransports().forEach(transport->{
 	    	System.out.println("Supported Transport: " + transport.name());
 	    });
+	    
 	    //TODO: set the maximum payload data 
 	    socketConfig.setMaxFramePayloadLength(1*1024*1024); // megabytes * kilobytes * bytes
 	    
